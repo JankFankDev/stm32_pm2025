@@ -1,15 +1,24 @@
 #include <stdint.h>
 #include "stm32f10x.h"
+#include "spi.h"
+#include "ssd1306.h"
 
+#pragma region Lab3_val
 #define MIN_FREQ 1
 #define MAX_FREQ 64
 
 volatile uint32_t current_freq = 1;
 volatile uint8_t button_a_pressed = 0;
 volatile uint8_t button_b_pressed = 0;
+#pragma endregion Lab3_val
+
+void delay_ms(uint32_t ms) {
+    for (volatile uint32_t i = 0; i < ms * 1000; i++);
+}
 
 int main(void) {
-    RCC->APB2ENR |= RCC_APB2ENR_IOPBEN | RCC_APB2ENR_IOPCEN;
+	#pragma region Lab3
+	RCC->APB2ENR |= RCC_APB2ENR_IOPBEN | RCC_APB2ENR_IOPCEN;
     GPIOC->CRH &= ~GPIO_CRH_CNF13;
     GPIOC->CRH |= GPIO_CRH_MODE13;
     GPIOB->CRL &= ~(GPIO_CRL_CNF0 | GPIO_CRL_CNF1 | GPIO_CRL_MODE0 | GPIO_CRL_MODE1);
@@ -32,4 +41,10 @@ int main(void) {
         
 		for (uint32_t i = 0; i < 1000000 / current_freq; i++) __NOP();
     }
+	#pragma endregion Lab3
+
+	SSD1306_Init();
+    delay_ms(100);
+    
+    SSD1306_DrawChessBoard();
 }
